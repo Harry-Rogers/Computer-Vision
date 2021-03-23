@@ -1,42 +1,79 @@
 clear;close all; clc;
-I = imread('ara2013_plant001_rgb.png');
-figure, imshow(I);
 
-I = imresize(I, 5);
-
-
-gray= rgb2gray(I);
-figure;
-imhist(gray);
-
-%some reason 70 and 80 dont work? Should tho also have better accuracy with
-%value.
-% Can we do an if statement for finidng perfect value ie lowest?
-
-
-level = graythresh(gray);
-BW = imbinarize(gray, level);
-figure, imshow(BW);
-segment = segmentImage_from_back(I);
-figure, imshow(segment);
-
-
-%theFiles = dir('*rgb*.png');
-%for k = 1 : length(theFiles)
-%    baseFileName = theFiles(k).name;
-%    fullFileName = fullfile(theFiles(k).folder, baseFileName);
-%    fprintf(1, 'Now reading %s\n', fullFileName);
-    % Now do whatever you want with this file name,
-    % such as reading it in as an image array with imread()
+theFiles = dir('*rgb*.png');
+sim_score = 0;
+for k = 1 : length(theFiles)
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    baseFileName = theFiles(k).name;
+    fullFileName = fullfile(theFiles(k).folder, baseFileName);
+    fprintf(1, 'Now reading %s\n', fullFileName);
     
-%    imageArray = imread(fullFileName);
-%    imshow(imageArray);  % Display image.
-%    gray = rgb2gray(image 
-%    x = segmentImage_from_back(imageArray);
-%    figure, imshow(x);
-%end
+    imageArray = imread(fullFileName);
+    segmented = segmentImage_from_back(imageArray);
+    imageArrayGray = im2gray(imageArray);
+    lvl = graythresh(imageArrayGray);
+    bw = imbinarize(imageArrayGray, lvl);
+    
+    
+    similarity = dice(segmented, bw);
+    
+    if similarity < 0.3
+        segmented = imcomplement(segmented);
+        imshowpair(segmented, bw, 'montage');
+    end
+    
+    similarity = dice(segmented, bw);
+    similarity
+    
+    figure;
+    imshowpair(segmented, bw, 'montage'), title(baseFileName);
+    sim_score = sim_score + similarity;
+    dice_av = sim_score/length(theFiles);
+    
 
+    gmag = imgradient(imageArrayGray);
 
+    se = strel('disk',5);
+    Io = imopen(imageArrayGray,se);
+    %imshow(Io);
+    Ie = imerode(imageArrayGray,se);
+    Iobr = imreconstruct(Ie,imageArrayGray);
+    %imshow(Iobr);
+    Ioc = imclose(Io,se);
+    %imshow(Ioc);
+    Iobrd = imdilate(Iobr,se);
+    Iobrcbr = imreconstruct(imcomplement(Iobrd),imcomplement(Iobr));
+    Iobrcbr = imcomplement(Iobrcbr);
+    %imshow(Iobrcbr);
+    fgm = imregionalmax(Iobrcbr);
+    %imshow(fgm);
+    I2 = labeloverlay(imageArrayGray,fgm);
+    %imshow(I2);
+    se2 = strel(ones(5,5));
+    fgm2 = imclose(fgm,se2);
+    fgm3 = imerode(fgm2,se2);
+    fgm4 = bwareaopen(fgm3,20);
+    I3 = labeloverlay(imageArrayGray,fgm4);
+    %imshow(I3);
+    D = bwdist(bw);
+    DL = watershed(D);
+    bgm = DL == 0;
+    %imshow(bgm);
+    
+    gmag2 = imimposemin(gmag, bgm | fgm4);
+    L = watershed(gmag2);
+    Lrgb = label2rgb(L,'jet','w','shuffle');
+    %imshow(Lrgb);
+    %figure;
+    
+    CC = bwconncomp(bw);
+    
+    labels = labelmatrix(CC);
+    numObjects = max(L(:));
+    numObjects
+
+end    
+dice_av
 
 
 function [BW,maskedImage] = segmentImage_from_back(RGB)
@@ -64,8 +101,6 @@ maskedImage = RGB;
 maskedImage(repmat(~BW,[1 1 3])) = 0;
 end
 
-%dice_score = 2*nnz(segIm&grndTruth)/(nnz(segIm) + nnz(grndTruth))
-% need to binarize img for dicescore
 
 
 %https://uk.mathworks.com/help/images/ref/imsegkmeans.html
