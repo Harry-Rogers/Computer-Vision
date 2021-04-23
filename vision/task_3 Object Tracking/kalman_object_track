@@ -1,0 +1,4 @@
+table_A = readtable('a.csv');
+table_b = readtable('b.csv');
+table_x = readtable('x.csv');
+table_y = readtable('y.csv');

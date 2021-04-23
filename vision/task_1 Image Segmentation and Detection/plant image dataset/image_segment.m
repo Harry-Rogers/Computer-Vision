@@ -15,9 +15,12 @@ for k = 1 : length(theFiles)
     fprintf(1, 'Now reading %s\n', fullFileName);
     
     %read file
-    imageArray2 = imread(fullFileName);
+    imageArrayOrig = imread(fullFileName);
     %call segmentation function pass rgb image
-    segmented = segmentImage_from_back(imageArray2);
+    segmented = segmentImage_from_back(imageArrayOrig);
+    
+    [centers, radii, metric] = imfindcircles(imageArrayOrig,[15 30]);
+    viscircles(centers, radii,'EdgeColor','b');
     
     %Read in labelled image and print
     baseFileName = labels(k).name;
@@ -46,7 +49,7 @@ for k = 1 : length(theFiles)
     score(k) = similarity;
     
     %Segment the plant from background
-    segmented = bsxfun(@times, imageArray2, cast(segmented, 'like', imageArray2));
+    segmented = bsxfun(@times, imageArrayOrig, cast(segmented, 'like', imageArrayOrig));
     
     %Show image thats segmented and ground truth binary image
     figure;
