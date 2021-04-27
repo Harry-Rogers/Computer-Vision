@@ -11,6 +11,7 @@ indi = 0;
 miss_arr = [];
 upper = 30;
 lower = 5;
+sim_score = 0;
 for k = 1: length(theFiles)
     miss = 0;
     baseFileName = theFiles(k).name;
@@ -20,7 +21,6 @@ for k = 1: length(theFiles)
     %read file
     imageArrayOrig = imread(fullFileName);
     segmented = segmentImage_from_back(imageArrayOrig);
-    segmented = bsxfun(@times, imageArrayOrig, cast(segmented, 'like', imageArrayOrig));
     %Convert to grayscale
     Igray = rgb2gray(imageArrayOrig);
     %Convert to binary
@@ -30,39 +30,17 @@ for k = 1: length(theFiles)
     figure;
     imshow(binaryImg);
     I = imresize(imageArrayOrig, 2);
-    figure;s
+    figure;
     imshow(I);
     [centers, radii, metric] = imfindcircles(imageArrayOrig,[lower upper]);
     %[centersBright, radiiBright] = imfindcircles(gt_mask,[5 30],'ObjectPolarity','bright');
     
     stats = regionprops('table', binaryImg, 'Centroid', 'Eccentricity', 'EquivDiameter');
     stats
-
     
-    %image no edits
-    % 37.5 accuracy with (5, 30) and (5,35) and (5, 40)
-    % 6,40 has 18.7
-    %5, 60 gets 31.25
-    
-    
-    %segmented with func
-    %5,30 18.75
-    
-    %segmented with no back
-    %5,30 0 :(
-    
-    %binary manual
-    %5,30 Error
-    %Changed code 
-    %[centersBright, radiiBright] = imfindcircles(A,[Rmin Rmax],'ObjectPolarity','bright');
-    
-    %Integrate regionProps
-    % https://uk.mathworks.com/matlabcentral/answers/334096-why-does-imfindcircles-not-find-circles-in-my-image?s_tid=answers_rc1-3_p3_MLT
-
-    
+ 
     viscircles(centers, radii,'EdgeColor','b');
     leafGuess = length(metric);
-    
     baseFileName = labels(k).name;
     fullFileName = fullfile(labels(k).folder, baseFileName);
     fprintf(1, 'Now reading %s\n', fullFileName);
@@ -71,8 +49,29 @@ for k = 1: length(theFiles)
     groundtrutharray = imread(fullFileName);
     
     
+    
+    %Convert lablled image to binary
+    gt_mask = groundtrutharray >= 1; 
+    %calculate similarity score
+    similarity = dice(segmented, gt_mask);
+    
+    %if similarity score is < 0.3 means that the background is more
+    %prominent therefore need to flip and redo score
+    if similarity < 0.3
+        segmented = imcomplement(segmented);
+        imshowpair(segmented, gt_mask, 'montage');
+    end
+    %redo score
+    similarity = dice(segmented, gt_mask);
+    %print score
+    similarity
+    %add sim score to score array for bar chart
+    score(k) = similarity;
+    %Add up scores for average
+    sim_score = sim_score + similarity;
+    %divide by how many files there are
+    dice_av = sim_score/length(theFiles);
     %count the leaves in the labelled image 
-    %kinda cheating but not really?
     count = max(groundtrutharray);
     leaf_count = max(count);
     %leaf_count
@@ -82,7 +81,7 @@ for k = 1: length(theFiles)
     leafGuess
     leaf_count
     if leafGuess ~= leaf_count
-        %matlab is shit have to convert to numbers that can be negative
+        %matlab to convert to numbers that can be negative
         miss= int32(leafGuess) - int32(leaf_count);
     end
     miss_arr = [miss_arr, miss];
@@ -115,12 +114,26 @@ for k = 1: length(theFiles)
     end
     
 end
-
+%Display bar chart with title
+bar(score);
+title('Dice scores');
+%print dice average score
+dice_av
 av_acc = av_acc / length(theFiles);
 av_acc
 miss_arr
-
-
+holder = double(0.0);
+for k = 1: length(miss_arr)
+    if miss_arr(k) > 0
+        holder = double(miss_arr(k) + holder);
+    elseif miss_arr(k) < 0
+        holder = double(abs(miss_arr(k)) + holder);
+        
+    end
+end
+holder
+holding = double(holder/16);
+holding
 function [BW,maskedImage] = segmentImage_from_back(RGB)
 % Convert RGB image into L*a*b* color space.
 X = rgb2lab(RGB);
