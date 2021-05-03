@@ -35,17 +35,8 @@ for k = 1: length(theFiles)
     %Convert to binary
     threshold_value= graythresh(Igray);
     binaryImg = imbinarize(Igray, threshold_value);
-    %Show image
-    figure;
-    imshow(binaryImg);
-    %Resize image to try and identify smaller leaves
-    I = imresize(imageArrayOrig, 2);
-    figure;
-    imshow(I);
     %Find leaves with boundaries
     [centers, radii, metric] = imfindcircles(imageArrayOrig,[lower upper]);
-    %Show leaves found on image    
-    viscircles(centers, radii,'EdgeColor','b');
     %Take guess for leaves
     leafGuess = length(metric);
     
@@ -73,6 +64,15 @@ for k = 1: length(theFiles)
     end
     %redo score
     similarity = dice(segmented, gt_mask);
+    
+    %Segment the plant from background
+    segmented = bsxfun(@times, imageArrayOrig, cast(segmented, 'like', imageArrayOrig));
+    
+    %Show image thats segmented and ground truth binary image
+    figure;
+    imshowpair(segmented, gt_mask, 'montage');
+    %Show leaves found on image    
+    viscircles(centers, radii,'EdgeColor','b');
 
     %add sim score to score array for bar chart
     score(k) = similarity;
