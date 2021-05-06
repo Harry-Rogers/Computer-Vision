@@ -18,18 +18,15 @@ imshow(abs(f),[]); colormap(jet); colorbar;
 figure;
 transformed_img = log(1+abs(f));
 imshow(transformed_img,[]); colormap(jet); colorbar;
-figure;
+
 transformed_img = log(1+abs(f));
 imshow(transformed_img,[]); colormap(jet); colorbar;
 
-%Change frequency so that only certain parts are looked for atm all are
-%plotted
 freq = (0:255)*(100/256);
 power = abs(transformed_img).^2/256;
-figure;
+
 plot(freq, power);
-xlabel('Frequency')
-ylabel('Power')
+xlablel();
 
 % for i=1: length(transformed_img)
 %     for j=1: length(transformed_img)
