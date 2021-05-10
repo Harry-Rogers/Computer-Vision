@@ -4,103 +4,58 @@ table_a = csvread('a.csv'); %NOISE COORDS
 table_b = csvread('b.csv'); %NOISE COORDS
 table_x = csvread('x.csv'); %REAL COORDS
 table_y = csvread('y.csv'); %REAL COORDS
-fprintf("Tables:");
-
-table_a
-table_b
-table_x
-table_y
-
-table_a_mean = mean(table_a);
-table_b_mean = mean(table_b);
-table_x_mean = mean(table_x);
-table_y_mean = mean(table_y);
-fprintf('Table A mean %s\n', table_a_mean);
-fprintf('Table B mean %s\n', table_b_mean);
-fprintf('Table X mean %s\n', table_x_mean);
-fprintf('Table Y mean %s\n', table_y_mean);
-
-fprintf('\n');
-
-table_a_std = std(table_a);
-table_b_std = std(table_b);
-table_x_std = std(table_x);
-table_y_std = std(table_y);
-
-fprintf('Table A std %s\n', table_a_mean);
-fprintf('Table B std %s\n', table_b_mean);
-fprintf('Table X std %s\n', table_x_mean);
-fprintf('Table Y std %s\n', table_y_mean);
-
-fprintf('\n');
-
-nx = table_a - table_x;
-ny = table_b - table_y;
-
-mean_nx = mean(nx);
-mean_ny = mean(ny);
-
-fprintf('Mean noise in x %s\n', mean_nx);
-fprintf('Mean noise in y %s\n', mean_ny);
-fprintf('\n');
-
-std_nx = std(nx);
-std_ny = std(ny);
-
-fprintf('STD noise in x %s\n', std_nx);
-fprintf('STD noise in y %s\n', std_ny);
-fprintf('\n');
-
-
-
-
-track_a = kalmanTracking(table_a);
-track_b = kalmanTracking(table_b);
-
-n_track_x = track_a - table_x;
-n_track_y = track_b - table_y;
-
-
-
-X_coord = square(n_track_x);
-Y_coord = square(n_track_y);
-
-error = sqrt(X_coord + Y_coord);
-std_track_x = std(n_track_x);
-std_track_y = std(n_track_y);
-fprintf("STD for x coords = %s\n", std_track_x);
-fprintf("STD for y coords = %s\n", std_track_y);
-fprintf("\n");
-mean_track_x = mean(n_track_x);
-mean_track_y = mean(n_track_y);
-fprintf("Mean for x coords = %s\n", mean_track_x);
-fprintf("Mean for y coords = %s\n", mean_track_y);
-fprintf("\n");
-RMSE = sqrt(immse(error, table_x));
-fprintf("RMSE value = %s\n", RMSE);
-
-
-
+%plot noisy data with truth and legend
 plot(table_a, table_b, "+r");
 hold;
 plot(table_x, table_y, "xb");
-
-
-
+legend('Noisy data','Original', 'Location','northwest')
+%Stack data to be x and y coordinates in one array
+noise_data = [table_a; table_b];
+%Send to kalman tracking to get x,y coords for kalman
+[x_kal, y_kal] = kalmanTracking(noise_data);
+%Calculate the error
+kal_error = [];
+noise_error = [];
+%For loop over array to calculate error for noisy data and kalman
+for K=1: length(x_kal)
+    % error = sqrt( (true_x - predit_x)^2 + (true_y - predict_y)^2
+    % append to end of array
+    kal_error = [kal_error, sqrt((table_x(K) - x_kal(K))^2 + (sqrt((table_y(K) - y_kal(K))^2)))];
+    noise_error = [noise_error, sqrt((table_x(K) - table_a(K))^2 + (sqrt((table_y(K) - table_b(K))^2)))];
+end
+%Plot noisy data, kalman data, truth with legend
 figure;
-plot(track_a, track_b, "+r");
-hold;
+hold on
+plot(table_a, table_b, '+r');
+plot(x_kal, y_kal, "+g");
 plot(table_x, table_y, "xb");
+hold off
+legend('Noisy data','Kalman Filter','Original', 'Location','northwest')
 
-%initial_x = table_a(1,1);
+%average noise error
+mean_noise = mean(noise_error);
+%standard deviation noise error
+std_noise = std(noise_error);
+%RMSE noise
+RMSE_noise = sqrt((mean_noise.^2));
 
-%kalmanFilter = configureKalmanFilter('ConstantVelocity', initial_x, );
+%average kalman error
+mean_kal = mean(kal_error);
+%standard deviation kalman error
+std_kal = std(kal_error);
+%RMSE noise 
+RMSE_kal = sqrt((mean_kal.^2));
+%Putting into table
+averages = [mean_noise; mean_kal];
+stds = [std_noise; std_kal];
+RMSE = [RMSE_noise; RMSE_kal];
+names = {'Noisy data'; 'Kalman tracking'};
+%print table
+t = table(names, averages, stds, RMSE);
+t
 
-%predict = kalmanPredict(table_a, );
-%update = kalmanUpdate();
-%track = kalmanTracking();
-
-% rmse = sqrt(immse(scores, dates));
+%Functions taken from workshop Visual Tracking 2 
+%Found here https://learn-eu-central-1-prod-fleet01-xythos.learn.cloudflare.blackboardcdn.com/5eec76bac93d5/3091070?X-Blackboard-Expiration=1620410400000&X-Blackboard-Signature=5u9uHnXDsWRcKvd%2Bbd8ttsGOVq2A8ahMQvcDQ8rpqEk%3D&X-Blackboard-Client-Id=307403&response-cache-control=private%2C%20max-age%3D21600&response-content-disposition=inline%3B%20filename%2A%3DUTF-8%27%27workshop_tracking_2.pdf&response-content-type=application%2Fpdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20210507T120000Z&X-Amz-SignedHeaders=host&X-Amz-Expires=21600&X-Amz-Credential=AKIAZH6WM4PL5M5HI5WH%2F20210507%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Signature=4ce2213f43f31f622ecf88cfbaff5cebb04095e6727a9a904c25ccbd1252a009
 
 function [xp, Pp] = kalmanPredict(x, P, F, Q)
 % Prediction step of Kalman filter.
@@ -125,14 +80,15 @@ S = H * P * H' + R; % innovation covariance
 K = P * H' * inv(S); % Kalman gain
 zp = H * x; % predicted observation
 %%%%%%%%% UNCOMMENT FOR VALIDATION GATING %%%%%%%%%%
-%gate = (z - zp)' * inv(S) * (z - zp);
-%if gate > 9.21
-% warning('Observation outside validation gate');
-% xe = x;
-% Pe = P;
-% return
-%end
+gate = (z - zp)' * inv(S) * (z - zp);
+if gate > 18.42 %Unsure why but higher value makes it smoother whilst lower values make the results harsh and stay on the same x coordinate but just increase the y. Doubling the value makes it smoother.
+ xe = x;
+ Pe = P;
+ return
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
 xe = x + K * (z - zp); % estimated state
 Pe = P - K * S * K'; % estimated covariance
 end
@@ -141,7 +97,7 @@ function [px, py] = kalmanTracking(z)
 % Track a target with a Kalman filter
 % z: observation vector
 % Return the estimated state position coordinates (px,py)
-dt = 0.033; % time interval
+dt = 0.1; % time interval from brief
 N = length(z); % number of samples
 F = [1 dt 0 0; 0 1 0 0; 0 0 1 dt; 0 0 0 1]; % CV motion model
 Q = [0.16 0 0 0; 

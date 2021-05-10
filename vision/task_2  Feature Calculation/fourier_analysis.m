@@ -22,141 +22,51 @@ figure;
 transformed_img = log(1+abs(f));
 imshow(transformed_img,[]); colormap(jet); colorbar;
 
-%Change frequency so that only certain parts are looked for atm all are
-%plotted
-freq = (0:255)*(100/256);
-power = abs(transformed_img).^2/256;
-figure;
-plot(freq, power);
-xlabel('Frequency')
-ylabel('Power')
 
-% for i=1: length(transformed_img)
-%     for j=1: length(transformed_img)
-%         
-%         
-%         
-%         
-%     end
-% end
+%Radius can be anything but do all intesitiy going from 0 to pi until you
+%reach end of image plot on graph
+%angle 
+transformed_img_log = log(transformed_img);
 
+vector_S_r= [];
 
-% Spectral approach
-% iteratve over image transformed img
-% 
+for r = 0:127
+    S_r = 0;
+    for theta = 0:-1:-180
+    theta = deg2rad(theta);
+    [x, y] = pol2cart(theta, r);
+    x = round(x + 128); %Half of the image length
+    y = round(y + 128);
+    S_r = S_r + transformed_img_log(x, y);
+    %break
+    end
+    vector_S_r = [vector_S_r; S_r];
+    %break
+end
+% close all
+% vector_S_r
+figure('Name', 'Function of S(r)')
+plot(log(vector_S_r))
+xlabel('Radius (in terms of pixels)')
+ylabel('Frequency distribution across Theta')
 
-%Result = imrotate(Igray,angle);
-% 
-% resized = imresize(Igray, [256 256]);
-% figure;
-% plot(resized);
-% f = fft2(resized, 256,256);
-% figure;
-% imshow(f);
-% % Measure the minimum and maximum value of the transform amplitude
-% min(min(abs(f)));
-% max(max(abs(f)));
-% figure;
-% imshow(abs(f),[0 100]); colormap(jet); colorbar;
-% figure;
-% imshow(log(1+abs(f)),[0,3]); colormap(jet); colorbar;
-% 
-% % Look at the phases
-% figure;
-% imshow(angle(f),[-pi,pi]); colormap(jet); colorbar;
-
-%[x, y] = cart2pol(Igray);
-%x
-% 
-% for K=1: length(angle_arr)
-%     angled = imrotate(resized, angle_arr(K));
-%     % Compute Fourier Transform
-%     F = fft2(angled,256,256);
-%     figure;
-%     imshow(F);
-%     % Measure the minimum and maximum value of the transform amplitude
-%     min_trans = min(min(abs(F)));
-%     max_trans = max(max(abs(F)));
-%     figure;
-%     imshow(abs(F),[0 100]); colormap(jet); colorbar;
-%     figure;
-%     imshow(log(1+abs(F)),[0,3]); colormap(jet); colorbar;
-%     
-%     % Look at the phases
-%     figure;
-%     imshow(angle(F),[-pi,pi]); colormap(jet); colorbar;
-% end
-
-
-% Convert to polar coords
-%Complete frequency domain formulas
-
-%Josh;'s func
-% for i=1: length(thetas)
-%     sum = 0;
-%     for j=1: length(radii)
-%         [x, y] = pol2cart(deg2rad(thetas(i)), radii(j));
-%         sum = sum + abs(F(round(image_width/2+x), round(image_width.2+y));
-%         
-%     end
-% end
-
-
-
-
-
-
-% 
-% 
-% %offsets = [0 D; -D D; -D 0; -D -D];
-% for K=1: length(angle_arr)
-%     angled = imrotate(resized, angle_arr(K));
-%     %Co-occurence
-%     glcm_0_s = graycomatrix(angled, 'offset', [0 K],'NumLevels', 256, 'Symmetric',true);
-%     figure;
-%     imshow(glcm_0_s);
-%     title(angle_arr(K) + 'True Sym');
-%     
-%     
-%     glcm_0_s = graycomatrix(angled, 'offset', [-K K],'NumLevels', 256, 'Symmetric',true);
-%     figure;
-%     imshow(glcm_0_s);
-%     title(angle_arr(K) + ' True Sym');
-%     
-%     
-%     glcm_0_s = graycomatrix(angled, 'offset', [-K K],'NumLevels', 256, 'Symmetric',true);
-%     figure;
-%     imshow(glcm_0_s);
-%     title(angle_arr(K) + ' True Sym');
-%     
-%     glcm_0_s = graycomatrix(angled, 'offset', [-K -K],'NumLevels', 256, 'Symmetric',true);
-%     figure;
-%     imshow(glcm_0_s);
-%     title(angle_arr(K) + ' True Sym');
-%     
-%     glcm_0_s = graycomatrix(angled, 'offset', [0 K],'NumLevels', 256, 'Symmetric',false);
-%     figure;
-%     imshow(glcm_0_s);
-%     title(angle_arr(K) + 'False Sym');
-%     
-%     
-%     glcm_0_s = graycomatrix(angled, 'offset', [-K K],'NumLevels', 256, 'Symmetric',false);
-%     figure;
-%     imshow(glcm_0_s);
-%     title(angle_arr(K) + ' False Sym');
-%     
-%     
-%     glcm_0_s = graycomatrix(angled, 'offset', [-K K],'NumLevels', 256, 'Symmetric',false);
-%     figure;
-%     imshow(glcm_0_s);
-%     title(angle_arr(K) + ' False Sym');
-%     
-%     glcm_0_s = graycomatrix(angled, 'offset', [-K -K],'NumLevels', 256, 'Symmetric',false);
-%     figure;
-%     imshow(glcm_0_s);
-%     title(angle_arr(K) + ' False Sym');
-%    
-%     
-% end
-
+%Theta but in radius
+vector_S_theta = [];
+count = 0;
+for theta = 0:-1:-180
+    theta = deg2rad(theta);
+    S_theta = 0;
+    for r = 0:127
+        [x,y] = pol2cart(theta, r);
+        x = round(x + 128); %Half of the image length
+        y = round(y + 128);
+        S_theta = S_theta + transformed_img_log(x, y);       
+    end
+    vector_S_theta = [vector_S_theta; S_theta];
+    count = count + 1;
+end
+figure('Name', 'Function of S(theta)')
+plot(log(vector_S_theta))
+xlabel('Radius (in terms of pixels)')
+ylabel('Frequency distribution across Theta')
 
