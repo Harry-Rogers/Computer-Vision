@@ -1,9 +1,7 @@
 # Computer-Vision
 
-## Part 2 notes
+Task 1 Image Segmentation
 
-Spectral analysis can be either with radius, or orientation S(r) or S(θ).
+Task 2 Feature Extraction
 
-These will show the frequency distribution dependent on choice, either oreintation over the image in a specific direction or angle over the image across all angles.
-
-
+Task 3 Object Tracking
