@@ -1,6 +1,6 @@
 # Computer-Vision
 
-Task 1 Image segmentation
+Task 1 Image Segmentation
 
 Task 2 Feature Extraction
 
