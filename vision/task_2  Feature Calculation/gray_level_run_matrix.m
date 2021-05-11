@@ -94,5 +94,6 @@ LRHGE = reshape(double(LRHGE), 4,1);
 %Show in table
 T = table(angle_offset, SRE, LRE, GLN, RLN, RP, LGRE, HGRE, SRLGE, SRHGE, LRLGE, LRHGE);
 T
+writetable(T, 'test.xlsx','Sheet', 1);
 
 end
