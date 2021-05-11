@@ -1,0 +1,250 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>image_hist</title><meta name="generator" content="MATLAB 9.9"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-05-11"><meta name="DC.source" content="image_hist.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput">clear;close <span class="string">all</span>; clc;
+<span class="comment">% Prepare image</span>
+f = imread(<span class="string">'ImgPIA.jpg'</span>);
+<span class="comment">%convert image to gray</span>
+Igray = rgb2gray(f);
+
+<span class="comment">% https://uk.mathworks.com/matlabcentral/answers/24669-down-quantization-8-bit-grey-to-n-bit-grey-n-8</span>
+<span class="comment">% Reduce the number of bits to 6</span>
+reducedImage_6 = uint8((single(Igray)/256)*2^6);
+
+<span class="comment">% Reduce the number of bits to 4</span>
+reducedImage_4 = uint8((single(Igray)/256)*2^4);
+
+<span class="comment">% Reduce the number of bits to 2</span>
+reducedImage_2 = uint8((single(Igray)/256)*2^2);
+
+<span class="comment">%call functions and display relevant info</span>
+disp(<span class="string">'Grayscale image'</span>);
+histogram_features(Igray)
+
+disp(<span class="string">'6 Bit image'</span>);
+histogram_features(reducedImage_6)
+
+disp(<span class="string">'4 Bit image'</span>);
+histogram_features(reducedImage_4)
+
+disp(<span class="string">'2 Bit image'</span>);
+histogram_features(reducedImage_2)
+
+
+<span class="keyword">function</span> histogram_features(Igray)
+figure;
+imshow(Igray);
+figure;
+x = histogram(Igray);
+xlabel(<span class="string">'Value'</span>)
+ylabel(<span class="string">'Frequency'</span>)
+<span class="comment">%create histogram for calculations</span>
+[pixelCounts, graybin] = imhist(Igray);
+<span class="comment">%count number of pixels</span>
+pixels = sum(pixelCounts);
+<span class="comment">%average  sum of gray bins * pixel count/pixle num</span>
+averagebin = sum(graybin .* (pixelCounts / pixels));
+<span class="comment">%set variance</span>
+variance = 0;
+<span class="comment">%set skewness</span>
+skew = 0;
+<span class="comment">%set kurtosis</span>
+kurtosis = 0;
+<span class="comment">%For loop to calculate the features</span>
+<span class="keyword">for</span> i=0:1:length(pixelCounts)-1
+    <span class="comment">%variance calculation</span>
+    variance = variance + (i-averagebin)^2 * (pixelCounts(i+1)/pixels);
+    <span class="comment">%skew calculation</span>
+    skew = skew + (i-averagebin)^3 * (pixelCounts(i+1)/pixels);
+    <span class="comment">%kurtosis calculation</span>
+    kurtosis = kurtosis + (i-averagebin)^4 * (pixelCounts(i+1)/pixels)-3;
+<span class="keyword">end</span>
+<span class="comment">%find skewness</span>
+skew = skew * variance ^-3;
+<span class="comment">%find kurtosis</span>
+kurtosis = kurtosis * variance ^-4; <span class="comment">% kurtosis</span>
+<span class="comment">%display results in a table</span>
+t = table(averagebin, variance, skew, kurtosis);
+t
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">Grayscale image
+
+t =
+
+  1&times;4 table
+
+       averagebin           variance                skew                 kurtosis      
+    ________________    ________________    ____________________    ___________________
+
+    115.028027006173    1371.54101618446    1.05677824896143e-05    1.7670486073541e-06
+
+6 Bit image
+
+t =
+
+  1&times;4 table
+
+       averagebin           variance                skew                  kurtosis      
+    ________________    ________________    ____________________    ____________________
+
+    28.8819830246914    85.7976244626748    0.000674174042404827    0.000437472981546988
+
+4 Bit image
+
+t =
+
+  1&times;4 table
+
+       averagebin           variance               skew                kurtosis     
+    ________________    ________________    __________________    __________________
+
+    7.22074074074074    5.43755901920439    0.0412787008205884    -0.766156159839631
+
+2 Bit image
+
+t =
+
+  1&times;4 table
+
+       averagebin           variance               skew               kurtosis     
+    ________________    _________________    _________________    _________________
+
+    1.80739351851852    0.447873422303669    0.528206650145689    -19073.4527198493
+
+</pre><img vspace="5" hspace="5" src="image_hist_01.png" alt=""> <img vspace="5" hspace="5" src="image_hist_02.png" alt=""> <img vspace="5" hspace="5" src="image_hist_03.png" alt=""> <img vspace="5" hspace="5" src="image_hist_04.png" alt=""> <img vspace="5" hspace="5" src="image_hist_05.png" alt=""> <img vspace="5" hspace="5" src="image_hist_06.png" alt=""> <img vspace="5" hspace="5" src="image_hist_07.png" alt=""> <img vspace="5" hspace="5" src="image_hist_08.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2020b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+clear;close all; clc;
+% Prepare image
+f = imread('ImgPIA.jpg');
+%convert image to gray
+Igray = rgb2gray(f);
+
+% https://uk.mathworks.com/matlabcentral/answers/24669-down-quantization-8-bit-grey-to-n-bit-grey-n-8
+% Reduce the number of bits to 6
+reducedImage_6 = uint8((single(Igray)/256)*2^6);
+
+% Reduce the number of bits to 4
+reducedImage_4 = uint8((single(Igray)/256)*2^4);
+
+% Reduce the number of bits to 2
+reducedImage_2 = uint8((single(Igray)/256)*2^2);
+
+%call functions and display relevant info
+disp('Grayscale image');
+histogram_features(Igray)
+
+disp('6 Bit image');
+histogram_features(reducedImage_6)
+
+disp('4 Bit image');
+histogram_features(reducedImage_4)
+
+disp('2 Bit image');
+histogram_features(reducedImage_2)
+
+
+function histogram_features(Igray)
+figure;
+imshow(Igray);
+figure;
+x = histogram(Igray);
+xlabel('Value')
+ylabel('Frequency')
+%create histogram for calculations
+[pixelCounts, graybin] = imhist(Igray);
+%count number of pixels
+pixels = sum(pixelCounts);
+%average  sum of gray bins * pixel count/pixle num
+averagebin = sum(graybin .* (pixelCounts / pixels));
+%set variance
+variance = 0;  
+%set skewness
+skew = 0; 
+%set kurtosis
+kurtosis = 0; 
+%For loop to calculate the features
+for i=0:1:length(pixelCounts)-1
+    %variance calculation
+    variance = variance + (i-averagebin)^2 * (pixelCounts(i+1)/pixels);
+    %skew calculation
+    skew = skew + (i-averagebin)^3 * (pixelCounts(i+1)/pixels);
+    %kurtosis calculation
+    kurtosis = kurtosis + (i-averagebin)^4 * (pixelCounts(i+1)/pixels)-3;
+end
+%find skewness
+skew = skew * variance ^-3;
+%find kurtosis
+kurtosis = kurtosis * variance ^-4; % kurtosis
+%display results in a table
+t = table(averagebin, variance, skew, kurtosis);
+t
+end
+
+##### SOURCE END #####
+--></body></html>

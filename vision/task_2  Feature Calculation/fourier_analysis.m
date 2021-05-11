@@ -2,71 +2,129 @@ clear;close all; clc;
 % Prepare image
 f = imread('ImgPIA.jpg');
 imshow(f);
-
+%Convert to gray
 Igray = rgb2gray(f);
+%Reszie the image to 256,256
 resized = imresize(Igray, [256 256]);
+%2D fast fourier transform
 f = fft2(resized, 256, 256);
+%Shift to centre
 f = fftshift(f);
+%Show new image
 figure;
 imshow(f);
-
-% Measure the minimum and maximum value of the transform amplitude
-min = min(min(abs(f)));
-max = max(max(abs(f)));
-figure;
-imshow(abs(f),[]); colormap(jet); colorbar;
-figure;
-transformed_img = log(1+abs(f));
-imshow(transformed_img,[]); colormap(jet); colorbar;
+%Show the colormap of the transformed image
 figure;
 transformed_img = log(1+abs(f));
 imshow(transformed_img,[]); colormap(jet); colorbar;
 
-
-%Radius can be anything but do all intesitiy going from 0 to pi until you
-%reach end of image plot on graph
-%angle 
+%log the image for analysis
 transformed_img_log = log(transformed_img);
+%S(R) array for values
+SR = [];
+%S(theta) array for values
+ST = [];
 
-vector_S_r= [];
 
+%For the radius r (half of image since it will go to edge)
 for r = 0:127
-    S_r = 0;
+    %set S_R to 0
+    S_R = 0;
+    %for theta between 0 and -pi
     for theta = 0:-1:-180
+    %degrees to radians
     theta = deg2rad(theta);
+    %transform the polar coordinates from polar to cartesian
     [x, y] = pol2cart(theta, r);
+    %round the value add the other half of the image
+    x = round(x + 128); 
+    y = round(y + 128);
+    %S_R is S_R + the location of x and y in the log of the fourier
+    %transform image
+    S_R = S_R + transformed_img_log(x, y);
+    end
+    %SR to plot is SR and S_R location
+    SR = [SR; S_R];
+end
+%plot figure for S(R)
+figure;
+plot(log(SR))
+xlabel('Radius 0 to -pi')
+ylabel('Frequency')
+
+%Theta for loop 0 to -pi
+for theta = 0:-1:-180
+    %degrees to radians
+    theta = deg2rad(theta);
+    %set S_T to 0
+    S_T = 0;
+    %For the radius r (half of image since it will go to edge)
+    for r = 0:127
+        %transform the polar coordinates from polar to cartesian
+        [x,y] = pol2cart(theta, r);
+        %round the value add the other half of the image
+        x = round(x + 128); 
+        y = round(y + 128);
+        %S_T is S_T + the location of x and y in the log of the fourier
+        %transform image
+        S_T = S_T + transformed_img_log(x, y);       
+    end
+    %ST to plot is ST and S_T location
+    ST = [ST; S_T];
+end
+%plot figure for S(theta)
+figure;
+plot(log(ST))
+xlabel('Radius 0 to -pi')
+ylabel('Frequency')
+
+%For the radius r (half of image since it will go to edge)
+for r = 0:127
+    %set S_R to 0
+    S_R = 0;
+    %for theta between 0 and pi
+    for theta = 0:-1:180
+    %degrees to radians
+    theta = deg2rad(theta);
+    %transform the polar coordinates from polar to cartesian
+    [x, y] = pol2cart(theta, r);
+    %round the value add the other half of the image
     x = round(x + 128); %Half of the image length
     y = round(y + 128);
-    S_r = S_r + transformed_img_log(x, y);
-    %break
+    %S_R is S_R + the location of x and y in the log of the fourier
+    %transform image
+    S_R = S_R + transformed_img_log(x, y);
     end
-    vector_S_r = [vector_S_r; S_r];
-    %break
+    %SR to plot is SR and S_R location
+    SR = [SR; S_R];
 end
-% close all
-% vector_S_r
-figure('Name', 'Function of S(r)')
-plot(log(vector_S_r))
-xlabel('Radius (in terms of pixels)')
-ylabel('Frequency distribution across Theta')
+figure;
+plot(log(SR))
+xlabel('Radius 0 to pi')
+ylabel('Frequency')
 
-%Theta but in radius
-vector_S_theta = [];
-count = 0;
-for theta = 0:-1:-180
+%Theta for loop 0 to pi
+for theta = 0:1:180
+    %degrees to radians
     theta = deg2rad(theta);
-    S_theta = 0;
+    %set S_T to 0
+    S_T = 0;
+    %For the radius r (half of image since it will go to edge)
     for r = 0:127
+        %transform the polar coordinates from polar to cartesian
         [x,y] = pol2cart(theta, r);
-        x = round(x + 128); %Half of the image length
+        %round the value add the other half of the image
+        x = round(x + 128); 
         y = round(y + 128);
-        S_theta = S_theta + transformed_img_log(x, y);       
+        %S_T is S_T + the location of x and y in the log of the fourier
+        %transform image
+        S_T = S_T + transformed_img_log(x, y);       
     end
-    vector_S_theta = [vector_S_theta; S_theta];
-    count = count + 1;
+    %ST to plot is ST and S_T location
+    ST = [ST; S_T];
 end
-figure('Name', 'Function of S(theta)')
-plot(log(vector_S_theta))
-xlabel('Radius (in terms of pixels)')
-ylabel('Frequency distribution across Theta')
-
+%plot figure for S(theta)
+figure;
+plot(log(ST))
+xlabel('Radius 0 to pi')
+ylabel('Frequency')

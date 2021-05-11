@@ -37,7 +37,7 @@ mean_noise = mean(noise_error);
 %standard deviation noise error
 std_noise = std(noise_error);
 %RMSE noise
-RMSE_noise = sqrt((mean_noise.^2));
+RMSE_noise = sqrt(sum(noise_error).^2)/numel(noise_error);
 
 %average kalman error
 mean_kal = mean(kal_error);
@@ -79,19 +79,16 @@ function [xe, Pe] = kalmanUpdate(x, P, H, R, z)
 S = H * P * H' + R; % innovation covariance
 K = P * H' * inv(S); % Kalman gain
 zp = H * x; % predicted observation
-%%%%%%%%% UNCOMMENT FOR VALIDATION GATING %%%%%%%%%%
 gate = (z - zp)' * inv(S) * (z - zp);
 if gate > 18.42 %Unsure why but higher value makes it smoother whilst lower values make the results harsh and stay on the same x coordinate but just increase the y. Doubling the value makes it smoother.
- xe = x;
- Pe = P;
- return
+    xe = x;
+    Pe = P;
+    return
 end
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 xe = x + K * (z - zp); % estimated state
 Pe = P - K * S * K'; % estimated covariance
 end
+
 
 function [px, py] = kalmanTracking(z)
 % Track a target with a Kalman filter
@@ -117,4 +114,16 @@ for i = 1 : N
 end
 px = s(1,:); % NOTE: s(2, :) and s(4, :), not considered here,
 py = s(3,:); % contain the velocities on x and y respectively
+end
+
+function r=rmse(data,estimate)
+% Function to calculate root mean square error from a data vector or matrix 
+% and the corresponding estimates.
+% Usage: r=rmse(data,estimate)
+% Note: data and estimates have to be of same size
+% Example: r=rmse(randn(100,100),randn(100,100));
+% delete records with NaNs in both datasets first
+I = ~isnan(data) & ~isnan(estimate); 
+data = data(I); estimate = estimate(I);
+r=sqrt(sum((data(:)-estimate(:)).^2)/numel(data));
 end
