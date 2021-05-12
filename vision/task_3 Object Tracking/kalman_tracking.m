@@ -37,14 +37,14 @@ mean_noise = mean(noise_error);
 %standard deviation noise error
 std_noise = std(noise_error);
 %RMSE noise
-RMSE_noise = sqrt((mean_noise.^2));
+RMSE_noise = sqrt((mean(noise_error.^2)));
 
 %average kalman error
 mean_kal = mean(kal_error);
 %standard deviation kalman error
 std_kal = std(kal_error);
 %RMSE noise 
-RMSE_kal = sqrt((mean_kal.^2));
+RMSE_kal = sqrt((mean(kal_error.^2)));
 %Putting into table
 averages = [mean_noise; mean_kal];
 stds = [std_noise; std_kal];
