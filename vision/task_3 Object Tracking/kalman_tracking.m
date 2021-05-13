@@ -81,7 +81,7 @@ K = P * H' * inv(S); % Kalman gain
 zp = H * x; % predicted observation
 %%%%%%%%% UNCOMMENT FOR VALIDATION GATING %%%%%%%%%%
 gate = (z - zp)' * inv(S) * (z - zp);
-if gate > 9.21 %Unsure why but higher value makes it smoother whilst lower values make the results harsh and stay on the same x coordinate but just increase the y. Doubling the value makes it smoother.
+if gate > 9.21 %Gating causes major errors, turn off to get better result or change value to be higher something like 18.42
  xe = x;
  Pe = P;
  return
