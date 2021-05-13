@@ -45,8 +45,8 @@ for K=1:length(rotation)
     glcm = graycomatrix(angled, 'offset', [-1 0]);
     disp('-D 0 offset')
     stats(glcm, rotation(K))
-    %-D -D offset
     
+    %-D -D offset
     glcm = graycomatrix(angled, 'offset', [-1 -1]);
     disp('-D -D offset')
     stats(glcm, rotation(K))
@@ -56,7 +56,7 @@ end
 
 function stats(glcm, rotation)
 %heavily based on https://www.imageeprocessing.com/2019/04/texture-measures-from-glcm-matlab-code.html
-%INITIALIZE THE VARIABLES
+%initilase variables
 Con=0;
 Hom=0;
 Asm=0;
@@ -66,7 +66,7 @@ Varx=0;
 Vary=0;
 GLCMCorrelation=0;
 
-%NORMALIZATION
+%normalise glcm
 GProb = glcm./sum(glcm(:));
 %divide original by sum
 GLCMProb = glcm./sum(glcm(:));
@@ -80,17 +80,17 @@ Hom = sum(sum(GLCMProb./(1+(ij).^2)));
 Asm = sum(sum(GLCMProb.^2));
 Meanx = sum(sum(GLCMProb.*ii));
 Meany = sum(sum(GLCMProb.*jj));
-
+%more calculations
 Energy = sqrt(Asm);
 MaxGLCM = max(GLCMProb(:));
 Entropy = sum(sum(-GLCMProb .* log10(GLCMProb+0.00001)));
 GLCMMean = (Meanx+Meany)/2;
-
+%complete variance of x and y
 Varx = sum(sum(GLCMProb.*(ii-Meanx).^2));
 Vary = sum(sum(GLCMProb.*(jj-Meany).^2));
-
+%combine variance for overall
 GLCMVar = (Varx+Vary)/2;
-
+%calculate correlation
 GLCMCorrelation = sum(sum(GLCMProb.*(ii-Meanx).*(jj-Meany)/sqrt(Varx*Vary)));
 %print
 fprintf('Rotation is')

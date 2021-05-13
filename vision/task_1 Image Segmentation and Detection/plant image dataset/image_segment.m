@@ -1,5 +1,6 @@
 %Clear all
 clear; close all; clc;
+warning('off');
 %load in rgb and label images
 theFiles = dir('*rgb*.png');
 labels = dir('*label*.png');

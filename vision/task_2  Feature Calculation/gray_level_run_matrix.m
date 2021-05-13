@@ -78,7 +78,7 @@ for K=1:4
     LRLGE = [LRLGE, stats(K,10)];
     LRHGE = [LRHGE, stats(K,11)];
 end
-
+%unpack and reshape arrays for table
 SRE = reshape(double(SRE), 4,1);
 GLN = reshape(double(GLN), 4,1);
 LRE = reshape(double(LRE), 4,1);
@@ -94,6 +94,4 @@ LRHGE = reshape(double(LRHGE), 4,1);
 %Show in table
 T = table(angle_offset, SRE, LRE, GLN, RLN, RP, LGRE, HGRE, SRLGE, SRHGE, LRLGE, LRHGE);
 T
-writetable(T, 'test.xlsx','Sheet', 1);
-
 end
