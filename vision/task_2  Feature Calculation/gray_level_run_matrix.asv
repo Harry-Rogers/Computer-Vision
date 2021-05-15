@@ -8,9 +8,6 @@ warning('off')
 
 % https://uk.mathworks.com/matlabcentral/answers/24669-down-quantization-8-bit-grey-to-n-bit-grey-n-8
 
-% Reduce the number of bits to 32
-reducedImage_32 = uint8((single(Igray)/256)*2^5);
-
 % Reduce the number of bits to 8
 reducedImage_8 = uint8((single(Igray)/256)*2^3);
 
@@ -25,9 +22,6 @@ reducedImage_2 = uint8((single(Igray)/256)*2^1);
 %call functions and display relevant info
 disp('Grayscale image');
 graylevelmatrix(Igray)
-
-disp('32 Bit image');
-graylevelmatrix(reducedImage_32)
 
 disp('8 Bit image');
 graylevelmatrix(reducedImage_8)
