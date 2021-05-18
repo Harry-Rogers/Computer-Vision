@@ -70,18 +70,7 @@ end
 
 function stats(glcm, rotation)
 %heavily based on https://www.imageeprocessing.com/2019/04/texture-measures-from-glcm-matlab-code.html
-%initilase variables
-Con=0;
-Hom=0;
-Asm=0;
-Meanx=0;
-Meany=0;
-Varx=0;
-Vary=0;
-GLCMCorrelation=0;
 
-%normalise glcm
-GProb = glcm./sum(glcm(:));
 %divide original by sum
 GLCMProb = glcm./sum(glcm(:));
 %Create a mesh grid of size 1 to size of glcm by 1 to size of glcm  

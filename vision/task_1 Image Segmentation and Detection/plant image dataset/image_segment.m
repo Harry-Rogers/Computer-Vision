@@ -1,5 +1,6 @@
 %Clear all
 clear; close all; clc;
+%Turn off warnings
 warning('off');
 %load in rgb and label images
 theFiles = dir('*rgb*.png');
@@ -31,16 +32,11 @@ for k = 1: length(theFiles)
     imageArrayOrig = imread(fullFileName);
     %Segment image
     segmented = segmentImage_from_back(imageArrayOrig);
-    %Convert to grayscale
-    Igray = rgb2gray(imageArrayOrig);
-    %Convert to binary
-    threshold_value= graythresh(Igray);
-    binaryImg = imbinarize(Igray, threshold_value);
-    %Find leaves with boundaries
+    %Find leaves with original image
     [centers, radii, metric] = imfindcircles(imageArrayOrig,[lower upper]);
     figure;
     imshow(imageArrayOrig);
-    %Show leaves found on image    
+    %Show leaves found on image
     viscircles(centers, radii,'EdgeColor','b');
     %Take guess for leaves
     leafGuess = length(metric);
@@ -53,7 +49,7 @@ for k = 1: length(theFiles)
     %read file
     groundtrutharray = imread(fullFileName);
     
-    %Convert lablled image to binary
+    %Convert lablled image to binary, each label is 1 or more
     gt_mask = groundtrutharray >= 1; 
     
     %calculate similarity score
@@ -70,7 +66,7 @@ for k = 1: length(theFiles)
     %redo score
     similarity = dice(segmented, gt_mask);
     
-    %Segment the plant from background
+    %Segment the plant from background and show alongside original
     segmented = bsxfun(@times, imageArrayOrig, cast(segmented, 'like', imageArrayOrig));
     
     %Show image thats segmented and ground truth binary image
@@ -88,7 +84,7 @@ for k = 1: length(theFiles)
     leaf_count = max(count);
     %leaf_count accuracy
     if leafGuess == leaf_count
-        av_acc_leaf = av_acc_leaf + 1
+        av_acc_leaf = av_acc_leaf + 1;
     end
     
     %If leafguess not accurate add to miss
@@ -111,7 +107,7 @@ for k = 1: length(theFiles)
         
         %Check if any difference
         if leafGuess == leaf_count
-            av_acc_leaf = av_acc_leaf +1
+            av_acc_leaf = av_acc_leaf +1;
             viscircles(centers, radii,'EdgeColor','b');
             break;
         end
@@ -160,8 +156,6 @@ miss_arr = reshape(miss_arr, 16, 1);
 img_num = [1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16];
 %make table
 T = table(img_num, leaf_guess_arr, leaf_acc_arr, miss_arr)
-%print table
-mean_diff_leaf
 
 %Function for segmentation using matlab apps
 function [BW,maskedImage] = segmentImage_from_back(RGB)

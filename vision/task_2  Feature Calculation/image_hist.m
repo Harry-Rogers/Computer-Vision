@@ -74,6 +74,5 @@ kurtosis = sum((pixelCounts - meanGL) .^ 4 .* pixelCounts) / ((numberOfPixels - 
 Igray = double(Igray);
 variance = var(Igray(:));
 
-t = table(averagebin, variance, skew, kurtosis);
-t
+t = table(averagebin, variance, skew, kurtosis)
 end

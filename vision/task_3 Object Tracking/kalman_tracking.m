@@ -1,5 +1,5 @@
 clear;close all; clc;
-
+%read in coords
 table_a = csvread('a.csv'); %NOISE COORDS
 table_b = csvread('b.csv'); %NOISE COORDS
 table_x = csvread('x.csv'); %REAL COORDS
@@ -51,8 +51,7 @@ stds = [std_noise; std_kal];
 RMSE = [RMSE_noise; RMSE_kal];
 names = {'Noisy data'; 'Kalman tracking'};
 %print table
-t = table(names, averages, stds, RMSE);
-t
+t = table(names, averages, stds, RMSE)
 
 %Functions taken from workshop Visual Tracking 2 
 %Found here https://learn-eu-central-1-prod-fleet01-xythos.learn.cloudflare.blackboardcdn.com/5eec76bac93d5/3091070?X-Blackboard-Expiration=1620410400000&X-Blackboard-Signature=5u9uHnXDsWRcKvd%2Bbd8ttsGOVq2A8ahMQvcDQ8rpqEk%3D&X-Blackboard-Client-Id=307403&response-cache-control=private%2C%20max-age%3D21600&response-content-disposition=inline%3B%20filename%2A%3DUTF-8%27%27workshop_tracking_2.pdf&response-content-type=application%2Fpdf&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20210507T120000Z&X-Amz-SignedHeaders=host&X-Amz-Expires=21600&X-Amz-Credential=AKIAZH6WM4PL5M5HI5WH%2F20210507%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Signature=4ce2213f43f31f622ecf88cfbaff5cebb04095e6727a9a904c25ccbd1252a009

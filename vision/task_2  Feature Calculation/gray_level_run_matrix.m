@@ -22,6 +22,7 @@ reducedImage_4 = uint8((single(Igray)/256)*2^2);
 
 % Reduce the number of bits to 2
 reducedImage_2 = uint8((single(Igray)/256)*2^1);
+
 %call functions and display relevant info
 disp('Grayscale image');
 graylevelmatrix(Igray)
@@ -47,7 +48,7 @@ function graylevelmatrix(Igray)
 %https://uk.mathworks.com/matlabcentral/fileexchange/17482-gray-level-run-length-matrix-toolbox
 figure;
 imshow(Igray);
-[GLRLMS, SI] = grayrlmatrix(Igray);
+[GLRLMS, ~] = grayrlmatrix(Igray);
 %Get stats for gray level run
 stats = grayrlprops(GLRLMS);
 %set stats to be values that aren't values of e
@@ -105,6 +106,5 @@ SRHGE = reshape(double(SRHGE), 4,1);
 LRLGE = reshape(double(LRLGE), 4,1);
 LRHGE = reshape(double(LRHGE), 4,1);
 %Show in table
-T = table(angle_offset, SRE, LRE, GLN, RLN, RP, LGRE, HGRE, SRLGE, SRHGE, LRLGE, LRHGE);
-T
+T = table(angle_offset, SRE, LRE, GLN, RLN, RP, LGRE, HGRE, SRLGE, SRHGE, LRLGE, LRHGE)
 end

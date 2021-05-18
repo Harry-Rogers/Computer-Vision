@@ -102,6 +102,7 @@ for r = 0:half_img
     %SR to plot is SR and S_R location
     SR = [SR, S_R];
 end
+%plot S(R) again 
 figure;
 plot(log(SR))
 xlabel('Radius 0 to pi')
