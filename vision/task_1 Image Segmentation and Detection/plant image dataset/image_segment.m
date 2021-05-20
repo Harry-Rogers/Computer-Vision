@@ -6,8 +6,7 @@ warning('off');
 theFiles = dir('*rgb*.png');
 labels = dir('*label*.png');
 %Create variables for calculations
-%accuracy for leaf count
-av_acc_leaf = 0;
+%accuracy for leaf countav_acc_leaf = 0;
 %array of missed leaves
 miss_arr = [];
 %upper limit for leaf finding
